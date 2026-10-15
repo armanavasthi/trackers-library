@@ -1,0 +1,31 @@
+{
+  "$schema": "https://trackers.example/schemas/trackers-template-v1.json",
+  "schemaVersion": 1,
+  "kind": "dsa-template",
+  "metadata": {
+    "id": "dsa-fundamentals",
+    "version": "1.0.0",
+    "title": "DSA fundamentals",
+    "description": "A deliberately small foundation for building problem-solving habits.",
+    "levels": ["fresher", "junior"],
+    "subjects": ["arrays", "hashing", "two-pointers"],
+    "estimatedWeeks": 4,
+    "author": "Trackers"
+  },
+  "content": {
+    "sections": [{
+      "key": "core-patterns",
+      "name": "Core patterns",
+      "patterns": [
+        {"key": "arrays", "name": "Arrays", "problems": [
+          {"key": "pair-sum", "name": "Pair sum", "difficulty": "easy", "estimatedMinutes": 30, "resources": []},
+          {"key": "prefix-sums", "name": "Prefix sums", "difficulty": "medium", "estimatedMinutes": 45, "resources": []}
+        ]},
+        {"key": "two-pointers", "name": "Two pointers", "problems": [
+          {"key": "sorted-pair", "name": "Sorted pair search", "difficulty": "easy", "estimatedMinutes": 30, "resources": []},
+          {"key": "window-boundaries", "name": "Window boundaries", "difficulty": "medium", "estimatedMinutes": 45, "resources": []}
+        ]}
+      ]
+    }]
+  }
+}

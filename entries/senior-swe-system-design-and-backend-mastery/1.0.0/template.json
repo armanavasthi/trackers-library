@@ -1,0 +1,410 @@
+{
+  "$schema": "https://trackers.example/schemas/trackers-template-v1.json",
+  "schemaVersion": 1,
+  "kind": "study-template",
+  "metadata": {
+    "id": "senior-swe-system-design-and-backend-mastery",
+    "version": "1.0.0",
+    "title": "Senior Software Engineer Interview Curriculum: System Design and Java Backend",
+    "description": "A balanced study curriculum tailored for a Java and Spring Boot engineer with 2 years of experience targeting senior software engineering roles at large technology companies. Focuses on deep backend internals, distributed systems, scalable system design, and interview communication.",
+    "estimatedWeeks": 12,
+    "levels": [
+      "intermediate",
+      "advanced"
+    ],
+    "subjects": [
+      "software-engineering",
+      "system-design",
+      "java",
+      "spring-boot",
+      "distributed-systems"
+    ]
+  },
+  "content": {
+    "sections": [
+      {
+        "key": "java-jvm-concurrency-internals",
+        "name": "Java and JVM Internals for Senior Roles",
+        "topics": [
+          {
+            "key": "jvm-memory-and-gc",
+            "name": "JVM Memory Architecture and Garbage Collection",
+            "subtopics": [
+              {
+                "key": "jvm-memory-regions-and-jmm",
+                "name": "Heap, Metaspace, Stack, and Java Memory Model Happens-Before Guarantees",
+                "estimatedMinutes": 90
+              },
+              {
+                "key": "gc-algorithms-and-tradeoffs",
+                "name": "G1GC, ZGC, and Generational GC Trade-offs for Low-Latency Services",
+                "estimatedMinutes": 90
+              },
+              {
+                "key": "jvm-profiling-and-leak-diagnostics",
+                "name": "Diagnosing Memory Leaks, Thread Contention, and GC Pauses via Heap Dumps and JFR",
+                "estimatedMinutes": 75
+              }
+            ]
+          },
+          {
+            "key": "java-concurrency-and-multithreading",
+            "name": "Advanced Concurrency and Multithreading",
+            "subtopics": [
+              {
+                "key": "locks-atomics-and-cas",
+                "name": "Intrinsic Locks, ReentrantLock, ReadWriteLock, StampedLock, and CAS Operations",
+                "estimatedMinutes": 90
+              },
+              {
+                "key": "thread-pools-and-completablefuture",
+                "name": "ExecutorService Sizing, ForkJoinPool Work-Stealing, and CompletableFuture Pipelines",
+                "estimatedMinutes": 75
+              },
+              {
+                "key": "virtual-threads-and-structured-concurrency",
+                "name": "Java Virtual Threads, Carrier Thread Pinning, and High-Throughput I/O Patterns",
+                "estimatedMinutes": 75
+              }
+            ]
+          },
+          {
+            "key": "spring-boot-production-internals",
+            "name": "Spring Boot and Enterprise Backend Internals",
+            "subtopics": [
+              {
+                "key": "ioc-aop-and-proxy-mechanics",
+                "name": "Bean Lifecycle, Circular Dependencies, and JDK Dynamic vs CGLIB Proxies",
+                "estimatedMinutes": 75
+              },
+              {
+                "key": "spring-transaction-management",
+                "name": "Declarative Transactions, Propagation Modes, Isolation Levels, and Proxy Pitfalls",
+                "estimatedMinutes": 90
+              },
+              {
+                "key": "connection-pooling-and-non-blocking-io",
+                "name": "HikariCP Sizing, Tomcat Thread Model vs Spring WebFlux Event Loop Trade-offs",
+                "estimatedMinutes": 75
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "key": "networking-storage-and-data-internals",
+        "name": "Networking and Storage Engine Foundations",
+        "topics": [
+          {
+            "key": "network-protocols-and-api-paradigms",
+            "name": "Network Protocols and Service Communication",
+            "subtopics": [
+              {
+                "key": "tcp-tls-and-http-evolution",
+                "name": "TCP Handshake, Congestion Control, TLS Overhead, and HTTP/1.1 vs HTTP/2 vs HTTP/3",
+                "estimatedMinutes": 75
+              },
+              {
+                "key": "rest-grpc-and-graphql-tradeoffs",
+                "name": "REST, gRPC with Protocol Buffers, and GraphQL Architectural Trade-offs",
+                "estimatedMinutes": 60
+              },
+              {
+                "key": "realtime-transport-protocols",
+                "name": "WebSockets, Server-Sent Events (SSE), and Long Polling for Real-Time Delivery",
+                "estimatedMinutes": 60
+              }
+            ]
+          },
+          {
+            "key": "storage-engines-and-indexing",
+            "name": "Database Storage Engines and Indexing",
+            "subtopics": [
+              {
+                "key": "btree-vs-lsm-tree-engines",
+                "name": "B+Tree vs LSM-Tree Storage Engines, SSTables, Compaction, and Bloom Filters",
+                "estimatedMinutes": 90
+              },
+              {
+                "key": "acid-isolation-and-mvcc",
+                "name": "ACID Guarantees, Read Phenomena, MVCC, and Pessimistic vs Optimistic Locking",
+                "estimatedMinutes": 90
+              },
+              {
+                "key": "query-execution-and-index-design",
+                "name": "Composite Indexes, Covering Indexes, Write Amplification, and Query Plan Analysis",
+                "estimatedMinutes": 75
+              }
+            ]
+          },
+          {
+            "key": "nosql-and-polyglot-persistence",
+            "name": "Data Models and Polyglot Persistence",
+            "subtopics": [
+              {
+                "key": "document-key-value-and-wide-column",
+                "name": "Relational vs Document, Key-Value, and Wide-Column Store Selection Criteria",
+                "estimatedMinutes": 75
+              },
+              {
+                "key": "search-time-series-and-graph-stores",
+                "name": "Inverted Indexes for Full-Text Search, Time-Series Databases, and Graph Storage",
+                "estimatedMinutes": 75
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "key": "distributed-systems-core-primitives",
+        "name": "Distributed Systems Core Primitives",
+        "topics": [
+          {
+            "key": "replication-and-consistency-models",
+            "name": "Replication Topologies and Consistency Models",
+            "subtopics": [
+              {
+                "key": "leader-follower-and-multi-leader",
+                "name": "Single-Leader, Multi-Leader, and Leaderless Replication with Quorum Reads/Writes",
+                "estimatedMinutes": 90
+              },
+              {
+                "key": "cap-pacelc-and-consistency-spectrum",
+                "name": "CAP Theorem, PACELC, Linearizability, Sequential, and Eventual Consistency",
+                "estimatedMinutes": 90
+              },
+              {
+                "key": "conflict-resolution-and-vector-clocks",
+                "name": "Last-Write-Wins Pitfalls, Version Vectors, and CRDTs in Replicated Data",
+                "estimatedMinutes": 60
+              }
+            ]
+          },
+          {
+            "key": "partitioning-and-sharding",
+            "name": "Data Partitioning and Sharding Strategies",
+            "subtopics": [
+              {
+                "key": "range-vs-hash-partitioning",
+                "name": "Range vs Hash Sharding, Partition Keys, and Secondary Index Routing Strategies",
+                "estimatedMinutes": 75
+              },
+              {
+                "key": "consistent-hashing-and-rebalancing",
+                "name": "Consistent Hashing with Virtual Nodes, Shard Rebalancing, and Hot-Key Mitigation",
+                "estimatedMinutes": 75
+              }
+            ]
+          },
+          {
+            "key": "consensus-coordination-and-transactions",
+            "name": "Consensus, Coordination, and Distributed Transactions",
+            "subtopics": [
+              {
+                "key": "raft-paxos-and-leader-election",
+                "name": "Consensus Fundamentals (Raft/Paxos), Split-Brain Prevention, and Fencing Tokens",
+                "estimatedMinutes": 90
+              },
+              {
+                "key": "distributed-locks-and-leases",
+                "name": "Distributed Locking with Leases, Timeouts, and ZooKeeper/etcd Coordination Patterns",
+                "estimatedMinutes": 75
+              },
+              {
+                "key": "two-phase-commit-saga-and-outbox",
+                "name": "2PC Limitations, Orchestrated vs Choreographed Sagas, and Transactional Outbox",
+                "estimatedMinutes": 90
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "key": "scalable-system-building-blocks",
+        "name": "Scalable System Building Blocks",
+        "topics": [
+          {
+            "key": "caching-architectures",
+            "name": "Multi-Tier Caching Architectures",
+            "subtopics": [
+              {
+                "key": "caching-topologies-and-write-policies",
+                "name": "Cache-Aside, Read-Through, Write-Through, and Write-Behind Consistency Trade-offs",
+                "estimatedMinutes": 75
+              },
+              {
+                "key": "cache-failure-modes-and-mitigation",
+                "name": "Thundering Herd (Stampede), Cache Penetration, Avalanche, and Hot-Key Replication",
+                "estimatedMinutes": 75
+              },
+              {
+                "key": "eviction-and-edge-caching",
+                "name": "LRU/LFU Eviction Policies, Redis Internals, and CDN Edge Invalidations",
+                "estimatedMinutes": 60
+              }
+            ]
+          },
+          {
+            "key": "messaging-and-event-streaming",
+            "name": "Asynchronous Messaging and Event Streaming",
+            "subtopics": [
+              {
+                "key": "queues-vs-log-brokers",
+                "name": "Point-to-Point Message Queues vs Partitioned Append-Only Log Brokers",
+                "estimatedMinutes": 75
+              },
+              {
+                "key": "delivery-semantics-and-idempotency",
+                "name": "At-Least-Once vs Effectively-Once Delivery, Consumer Offsets, and Idempotency Keys",
+                "estimatedMinutes": 90
+              },
+              {
+                "key": "backpressure-and-dlq-handling",
+                "name": "Ordering Guarantees per Partition, Poison Pill Retries, DLQs, and Backpressure",
+                "estimatedMinutes": 75
+              }
+            ]
+          },
+          {
+            "key": "traffic-management-and-resilience",
+            "name": "Traffic Management, Resilience, and Observability",
+            "subtopics": [
+              {
+                "key": "load-balancing-and-api-gateways",
+                "name": "L4 vs L7 Load Balancing, Routing Algorithms, and API Gateway Responsibilities",
+                "estimatedMinutes": 60
+              },
+              {
+                "key": "rate-limiting-and-fault-isolation",
+                "name": "Distributed Rate Limiting Algorithms, Circuit Breakers, Bulkheads, and Load Shedding",
+                "estimatedMinutes": 90
+              },
+              {
+                "key": "jitter-retries-and-observability",
+                "name": "Exponential Backoff with Jitter, Distributed Tracing, Tail-Latency SLIs, and Error Budgets",
+                "estimatedMinutes": 75
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "key": "canonical-system-design-case-studies",
+        "name": "Canonical System Design Architectures",
+        "topics": [
+          {
+            "key": "core-infrastructure-services",
+            "name": "Core Infrastructure and Coordination Systems",
+            "subtopics": [
+              {
+                "key": "unique-id-and-rate-limiter-design",
+                "name": "Distributed Unique ID Generator (Snowflake) and Global API Rate Limiter Design",
+                "estimatedMinutes": 90
+              },
+              {
+                "key": "distributed-task-scheduler-design",
+                "name": "Delayed and Recurring Distributed Job Scheduler with Fault-Tolerant Execution",
+                "estimatedMinutes": 90
+              },
+              {
+                "key": "notification-and-webhook-delivery",
+                "name": "Multi-Channel Notification Pipeline and High-Reliability Webhook Delivery System",
+                "estimatedMinutes": 75
+              }
+            ]
+          },
+          {
+            "key": "social-content-and-realtime-systems",
+            "name": "Social Graphs, Feeds, and Real-Time Collaboration",
+            "subtopics": [
+              {
+                "key": "news-feed-and-fanout-hybrid",
+                "name": "Social News Feed Generation: Push vs Pull Fan-Out and Celebrity Hybrid Model",
+                "estimatedMinutes": 90
+              },
+              {
+                "key": "realtime-chat-and-presence",
+                "name": "Multi-Device Chat System, Session Routing, Message Ordering, and Presence Tracking",
+                "estimatedMinutes": 90
+              },
+              {
+                "key": "collaborative-document-editing",
+                "name": "Real-Time Collaborative Editing Architecture using OT vs CRDTs and State Snapshots",
+                "estimatedMinutes": 75
+              }
+            ]
+          },
+          {
+            "key": "commerce-geo-and-analytics-systems",
+            "name": "Transactional, Geo-Spatial, and High-Ingestion Systems",
+            "subtopics": [
+              {
+                "key": "flash-sale-and-ticket-booking",
+                "name": "High-Contention Inventory Reservation and Ticket Booking without Double-Spending",
+                "estimatedMinutes": 90
+              },
+              {
+                "key": "proximity-and-ride-matching",
+                "name": "Geo-Spatial Indexing (Geohash/Quadtree/S2) and Real-Time Location Matching",
+                "estimatedMinutes": 90
+              },
+              {
+                "key": "top-k-and-metrics-aggregation",
+                "name": "Real-Time Top-K Leaderboards, Stream Windows, and Approximate Counting (Count-Min Sketch)",
+                "estimatedMinutes": 90
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "key": "senior-interview-execution-and-leadership",
+        "name": "Senior Interview Execution and Technical Leadership",
+        "topics": [
+          {
+            "key": "system-design-communication-framework",
+            "name": "Structuring the 45-Minute System Design Interview",
+            "subtopics": [
+              {
+                "key": "requirements-and-capacity-estimation",
+                "name": "Scoping Functional/Non-Functional Requirements and Pragmatic Back-of-the-Envelope Math",
+                "estimatedMinutes": 60
+              },
+              {
+                "key": "api-contracts-and-high-level-synthesis",
+                "name": "Defining Clean API Contracts, Data Schemas, and End-to-End High-Level Flows",
+                "estimatedMinutes": 60
+              },
+              {
+                "key": "proactive-deep-dives-and-tradeoffs",
+                "name": "Driving Bottleneck Analysis, Failure Mode Mitigation, and Articulate Trade-off Defense",
+                "estimatedMinutes": 75
+              }
+            ]
+          },
+          {
+            "key": "senior-engineering-behavioral-signals",
+            "name": "Demonstrating Senior Scope and Ownership",
+            "subtopics": [
+              {
+                "key": "reframing-experience-for-senior-bar",
+                "name": "Framing 2-Year Experience Around Architectural Impact, Ambiguity Resolution, and Ownership",
+                "estimatedMinutes": 75
+              },
+              {
+                "key": "incident-management-and-postmortems",
+                "name": "Communicating Production Incident Triage, Root-Cause Analysis, and Systemic Prevention",
+                "estimatedMinutes": 60
+              },
+              {
+                "key": "cross-team-alignment-and-mentorship",
+                "name": "Navigating Technical Disagreements, Design Reviews, and Elevating Team Standards",
+                "estimatedMinutes": 60
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

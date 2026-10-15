@@ -1,0 +1,46 @@
+{
+  "$schema": "https://trackers.example/schemas/learning-library-entry-v1.json",
+  "schemaVersion": 1,
+  "id": "senior-swe-system-design-and-backend-mastery",
+  "slug": "senior-swe-system-design-and-backend-mastery",
+  "version": "1.0.0",
+  "packageType": "tracker",
+  "templateKind": "study-template",
+  "title": "Senior Software Engineer Interview Curriculum: System Design and Java Backend",
+  "summary": "A balanced study curriculum tailored for a Java & Spring Boot engineer targeting senior software engineering roles. Covers JVM internals, storage engines, distributed primitives, caching, messaging, and system design interviews.",
+  "description": "A comprehensive study curriculum tailored for engineers targeting senior software engineering roles at tier-1 and FAANG technology companies. Focuses on deep Java/JVM internals, storage engine mechanics, distributed systems primitives, scalable architecture building blocks, real-world case studies (flash sales, feed generation, collaborative editing), and the 45-minute system design interview communication framework.",
+  "categoryIds": [
+    "software-engineering",
+    "system-design",
+    "interview-preparation"
+  ],
+  "tags": [
+    "java",
+    "spring-boot",
+    "system-design",
+    "distributed-systems",
+    "concurrency",
+    "microservices"
+  ],
+  "levels": [
+    "intermediate",
+    "advanced"
+  ],
+  "estimatedWeeks": 12,
+  "creator": {
+    "id": "community.contributor",
+    "displayName": "Trackers Community",
+    "profileUrl": "https://github.com/trackers-app"
+  },
+  "license": {
+    "spdxId": "MIT",
+    "attributionText": "Trackers Community"
+  },
+  "template": {
+    "path": "template.json",
+    "sha256": "7ad74f6ace3ce894b79b10c641b2731aa32fd45ec7ccad03c0c2a9c89e9549e6",
+    "bytes": 16630
+  },
+  "publishedAt": "2026-10-16T00:00:00Z",
+  "updatedAt": "2026-10-16T00:00:00Z"
+}

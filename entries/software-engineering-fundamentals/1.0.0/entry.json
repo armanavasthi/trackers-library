@@ -1,0 +1,32 @@
+{
+  "$schema": "https://trackers.example/schemas/learning-library-entry-v1.json",
+  "schemaVersion": 1,
+  "id": "software-engineering-fundamentals",
+  "slug": "software-engineering-fundamentals",
+  "version": "1.0.0",
+  "packageType": "tracker",
+  "templateKind": "study-template",
+  "title": "Software engineering fundamentals",
+  "summary": "Core engineering concepts for practical early-career judgment and delivery.",
+  "description": "A modest set of core topics for building practical engineering judgment. Covers version control, automated feedback, testing, data modeling, and basic transaction semantics.",
+  "categoryIds": ["software-engineering", "career-foundations"],
+  "tags": ["delivery", "data-foundations"],
+  "levels": ["beginner", "intermediate"],
+  "estimatedWeeks": 6,
+  "creator": {
+    "id": "curator.trackers",
+    "displayName": "Trackers Team",
+    "profileUrl": "https://trackers.example"
+  },
+  "license": {
+    "spdxId": "MIT",
+    "attributionText": "Trackers"
+  },
+  "template": {
+    "path": "template.json",
+    "sha256": "ee142beb6adf52d5722153ea32976e509e5bb5102449f2592c103ecd3746734e",
+    "bytes": 1235
+  },
+  "publishedAt": "2026-10-01T00:00:00Z",
+  "updatedAt": "2026-10-01T00:00:00Z"
+}

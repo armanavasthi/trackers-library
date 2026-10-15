@@ -1,0 +1,250 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://trackers.example/schemas/learning-library-catalog-v1.json",
+  "title": "Trackers Learning Library Catalog v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schemaVersion",
+    "revision",
+    "generatedAt",
+    "categories",
+    "entries"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "pattern": "^https://.+/schemas/learning-library-catalog-v1\\.json$"
+    },
+    "schemaVersion": {
+      "const": 1
+    },
+    "revision": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "generatedAt": {
+      "$ref": "#/$defs/isoUtcDate"
+    },
+    "categories": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 50,
+      "items": {
+        "$ref": "#/$defs/category"
+      }
+    },
+    "featuredEntryIds": {
+      "type": "array",
+      "maxItems": 50,
+      "items": {
+        "$ref": "#/$defs/key"
+      }
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/publishedEntry"
+      }
+    }
+  },
+  "$defs": {
+    "key": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80,
+      "pattern": "^[a-z0-9][a-z0-9-]{0,79}$"
+    },
+    "semver": {
+      "type": "string",
+      "maxLength": 120,
+      "pattern": "^\\d+\\.\\d+\\.\\d+(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "isoUtcDate": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?Z$"
+    },
+    "category": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "label", "description", "icon", "displayOrder"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/key"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 240
+        },
+        "icon": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "displayOrder": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        }
+      }
+    },
+    "creator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "displayName"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "pattern": "^[a-z0-9][a-z0-9.-]{0,79}$"
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "profileUrl": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048,
+          "pattern": "^https://"
+        }
+      }
+    },
+    "license": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["spdxId", "attributionText"],
+      "properties": {
+        "spdxId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 50,
+          "pattern": "^[A-Za-z0-9.-]+$"
+        },
+        "attributionText": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        }
+      }
+    },
+    "contentCounts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sections", "containers", "leaves", "resources"],
+      "properties": {
+        "sections": { "type": "integer", "minimum": 0 },
+        "containers": { "type": "integer", "minimum": 0 },
+        "leaves": { "type": "integer", "minimum": 0 },
+        "resources": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "planSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["totalEntries", "durationDays", "estimatedMinutes"],
+      "properties": {
+        "totalEntries": { "type": "integer", "minimum": 1 },
+        "durationDays": { "type": "integer", "minimum": 1, "maximum": 366 },
+        "estimatedMinutes": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "publishedCover": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "alt", "sha256", "bytes", "width", "height"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "alt": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "bytes": { "type": "integer", "minimum": 1, "maximum": 512000 },
+        "width": { "type": "integer", "minimum": 16, "maximum": 2400 },
+        "height": { "type": "integer", "minimum": 16, "maximum": 1600 }
+      }
+    },
+    "publishedTemplate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "bytes"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "bytes": { "type": "integer", "minimum": 1, "maximum": 2097152 }
+      }
+    },
+    "publishedEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "slug",
+        "version",
+        "packageType",
+        "templateKind",
+        "title",
+        "summary",
+        "description",
+        "categoryIds",
+        "tags",
+        "levels",
+        "estimatedWeeks",
+        "creator",
+        "license",
+        "contentCounts",
+        "template",
+        "publishedAt",
+        "updatedAt"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/key" },
+        "slug": { "$ref": "#/$defs/key" },
+        "version": { "$ref": "#/$defs/semver" },
+        "packageType": { "enum": ["tracker", "bundle"] },
+        "templateKind": { "enum": ["study-template", "dsa-template", "workspace-template"] },
+        "title": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "summary": { "type": "string", "minLength": 1, "maxLength": 240 },
+        "description": { "type": "string", "minLength": 1, "maxLength": 4000 },
+        "categoryIds": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 10,
+          "items": { "$ref": "#/$defs/key" }
+        },
+        "tags": {
+          "type": "array",
+          "maxItems": 20,
+          "items": { "$ref": "#/$defs/key" }
+        },
+        "levels": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4,
+          "items": { "enum": ["beginner", "intermediate", "advanced", "mixed"] }
+        },
+        "estimatedWeeks": { "type": "integer", "minimum": 1, "maximum": 520 },
+        "creator": { "$ref": "#/$defs/creator" },
+        "license": { "$ref": "#/$defs/license" },
+        "contentCounts": { "$ref": "#/$defs/contentCounts" },
+        "planSummary": { "$ref": "#/$defs/planSummary" },
+        "cover": { "$ref": "#/$defs/publishedCover" },
+        "template": { "$ref": "#/$defs/publishedTemplate" },
+        "publishedAt": { "$ref": "#/$defs/isoUtcDate" },
+        "updatedAt": { "$ref": "#/$defs/isoUtcDate" }
+      }
+    }
+  }
+}

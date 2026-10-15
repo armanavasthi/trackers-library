@@ -1,0 +1,51 @@
+[
+  {
+    "id": "dsa-algorithms",
+    "label": "DSA & Algorithms",
+    "description": "Problem-solving patterns, data structures, and algorithmic complexity.",
+    "icon": "code",
+    "displayOrder": 1
+  },
+  {
+    "id": "software-engineering",
+    "label": "Software Engineering",
+    "description": "Architecture, testing, delivery, debugging, and engineering practices.",
+    "icon": "layers",
+    "displayOrder": 2
+  },
+  {
+    "id": "system-design",
+    "label": "System Design",
+    "description": "Distributed systems, scalability, data modeling, and trade-offs.",
+    "icon": "cpu",
+    "displayOrder": 3
+  },
+  {
+    "id": "ai-data",
+    "label": "AI & Data",
+    "description": "Machine learning, data pipelines, LLM systems, and retrieval.",
+    "icon": "sparkles",
+    "displayOrder": 4
+  },
+  {
+    "id": "interview-preparation",
+    "label": "Interview Preparation",
+    "description": "Curated roadmaps and bounded study packages for technical interviews.",
+    "icon": "target",
+    "displayOrder": 5
+  },
+  {
+    "id": "career-foundations",
+    "label": "Career Foundations",
+    "description": "Core computer science fundamentals, engineering literacy, and habits.",
+    "icon": "compass",
+    "displayOrder": 6
+  },
+  {
+    "id": "general-learning",
+    "label": "General Learning",
+    "description": "Broad technical curricula and multidisciplinary engineering topics.",
+    "icon": "book-open",
+    "displayOrder": 7
+  }
+]

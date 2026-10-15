@@ -1,0 +1,31 @@
+{
+  "$schema": "https://trackers.example/schemas/trackers-template-v1.json",
+  "schemaVersion": 1,
+  "kind": "study-template",
+  "metadata": {
+    "id": "software-engineering-fundamentals",
+    "version": "1.0.0",
+    "title": "Software engineering fundamentals",
+    "description": "A modest set of core topics for building practical engineering judgment.",
+    "levels": ["fresher", "junior"],
+    "subjects": ["software-engineering", "databases", "web"],
+    "estimatedWeeks": 6,
+    "author": "Trackers"
+  },
+  "content": {
+    "sections": [{
+      "key": "engineering-basics",
+      "name": "Engineering basics",
+      "topics": [
+        {"key": "delivery", "name": "Delivery", "subtopics": [
+          {"key": "version-control", "name": "Version control habits", "estimatedMinutes": 45, "resources": []},
+          {"key": "testing-feedback", "name": "Testing and feedback", "estimatedMinutes": 60, "resources": []}
+        ]},
+        {"key": "data", "name": "Data foundations", "subtopics": [
+          {"key": "data-modeling", "name": "Data modeling", "estimatedMinutes": 60, "resources": []},
+          {"key": "transactions", "name": "Transactions", "estimatedMinutes": 60, "resources": []}
+        ]}
+      ]
+    }]
+  }
+}

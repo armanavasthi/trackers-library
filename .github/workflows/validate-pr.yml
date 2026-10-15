@@ -1,0 +1,57 @@
+name: Validate Pull Request
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'entries/**'
+      - 'categories.json'
+      - 'schemas/**'
+      - 'scripts/**'
+      - '.github/workflows/**'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  validate:
+    name: Automated Catalog & Template Validation Gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run Strict Validation
+        id: validator
+        run: |
+          echo "Starting automated validation..."
+          python3 scripts/validate.py --repo-root . --base-ref "origin/${{ github.base_ref }}"
+
+      - name: Test Deterministic Catalog Build
+        id: builder
+        run: |
+          echo "Testing static build..."
+          python3 scripts/build.py --repo-root . --dist-dir ./dist
+
+      - name: Generate PR Step Summary
+        if: always()
+        run: |
+          echo "## 🛡️ Trackers Automated Review Gate" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.validator.outcome }}" = "success" ] && [ "${{ steps.builder.outcome }}" = "success" ]; then
+            echo "✅ **All schemas, semver constraints, integrity hashes, and security sentinels passed with zero errors.**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Catalog Compilation Summary" >> $GITHUB_STEP_SUMMARY
+            echo "- **Categories Count:** $(grep -c '"id":' categories.json || true)" >> $GITHUB_STEP_SUMMARY
+            echo "- **Entries Packaged:** $(find entries -name "entry.json" | wc -l)" >> $GITHUB_STEP_SUMMARY
+            echo "- **Artifacts Ready:** \`dist/catalog-v1.json\` generated successfully." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Validation failed. Please review the job logs above for exact schema, syntax, or hash errors.**" >> $GITHUB_STEP_SUMMARY
+          fi
