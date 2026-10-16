@@ -8,6 +8,8 @@ on:
       - 'categories.json'
       - 'schemas/**'
       - 'scripts/**'
+      - 'tests/**'
+      - 'docs/examples/**'
       - '.github/workflows/**'
 
 permissions:
@@ -28,6 +30,9 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+
+      - name: Test Library Compatibility Contract
+        run: python3 -m unittest discover -s tests
 
       - name: Run Strict Validation
         id: validator

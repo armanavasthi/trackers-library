@@ -12,6 +12,17 @@ Any track merged into this repository is automatically built, cryptographically 
 * **Catalog API Manifest:** `https://armanavasthi.github.io/trackers-library/catalog-v1.json`
 * **Artifact Base URL:** `https://armanavasthi.github.io/trackers-library/artifacts/{id}/{version}/template.json`
 
+Study subtopics and DSA problems both support an optional primary `url` plus up to
+20 labelled `resources`. See the [complete linked workspace example](docs/examples/linked-workspace-template.json)
+and [authoring rules](CONTRIBUTING.md). Links must use HTTP(S), contain a host,
+and have no credentials; each URL is limited to 2048 characters. Prefilled item
+notes and personal progress are not supported in reusable packages.
+
+Author `entry.json` with local filenames (`template.json`, `cover.webp`). The
+builder publishes catalog paths as `artifacts/<id>/<version>/<filename>`, relative
+to the catalog base URL. The one optional cover supplies both the card thumbnail
+and detail artwork; use a 16:9 image such as 1600×900.
+
 ---
 
 ## 🤝 How to Contribute a Learning Track or DSA Sheet

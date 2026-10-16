@@ -17,7 +17,7 @@ entries/
     └── 1.0.0/
         ├── entry.json        # Metadata, author, license, tags, categories
         ├── template.json     # Curated syllabus, topics/problems, resources
-        └── cover.png         # (Optional) 1200x800 or 1600x900 cover artwork
+        └── cover.png         # (Optional) one 16:9 cover, e.g. 1600x900
 ```
 
 - `<id>`: Unique lowercase kebab-case identifier (e.g. `system-design-primer`, `blind-75-plus`).
@@ -38,7 +38,34 @@ Your `template.json` is a reusable Trackers template (`schemaVersion: 1`).
   - Use `topics` (Study) or `patterns` (DSA) to organize major domains and problem categories so installed tracks fit cleanly into users' accounts without hitting section capacity limits.
 - **Cleanliness**:
   - Reusable templates must **never** contain personal account data or progress states (`status`, `confidence`, `history`, `preferences`, `storagePath`).
-  - All resource URLs must be valid, publicly accessible HTTPS/HTTP links.
+  - All primary and resource URLs must use HTTP(S) with a host, contain no credentials or whitespace, and contain at most 2048 characters. The validator checks URL syntax; it does not fetch linked pages.
+
+#### Primary links and labelled resources
+
+Every Study subtopic and DSA problem supports the same optional fields:
+
+```json
+{
+  "key": "two-sum",
+  "name": "Two Sum",
+  "difficulty": "easy",
+  "url": "https://leetcode.com/problems/two-sum/",
+  "resources": [
+    {"label": "Hash table background", "url": "https://en.wikipedia.org/wiki/Hash_table"},
+    {"label": "Practice platform", "url": "https://leetcode.com/"}
+  ]
+}
+```
+
+For a Study subtopic, omit `difficulty`. `url` is the primary page for the item;
+`resources` contains up to 20 additional links with labels of 1–160 characters.
+Either field may be omitted. Keep all useful links, even when a primary page is
+present. Catalog `contentCounts.resources` counts distinct URLs per item across
+both fields, counting a repeated URL once within that item.
+
+Use the [complete workspace example](docs/examples/linked-workspace-template.json)
+for both tracker types. Reusable items cannot contain prefilled `notes`, status,
+history, attempts, or other personal progress data.
 
 ### 2. `entry.json`
 Your `entry.json` provides catalog metadata matching [learning-library-entry-v1.schema.json](schemas/learning-library-entry-v1.schema.json):
@@ -82,9 +109,30 @@ Your `entry.json` provides catalog metadata matching [learning-library-entry-v1.
 
 ### 3. Optional Cover Art
 - Formats: PNG, JPEG, or WebP.
-- Max file size: 512 KB.
-- Recommended dimensions: 1200×800 or 1600×900 px (Max: 2400×1600 px).
+- Max file size: 512,000 bytes.
+- Provide one optional cover for both the card thumbnail and detail artwork.
+- Recommended aspect ratio: 16:9, for example 1600×900 px (Max: 2400×1600 px).
 - If included, compute `bytes`, `sha256`, `width`, and `height` in `entry.json.cover`.
+
+Add this metadata to `entry.json` when including `cover.webp` (replace the hash,
+byte count, and dimensions with those of your actual file):
+
+```json
+"cover": {
+  "path": "cover.webp",
+  "alt": "Illustration of the course topics",
+  "sha256": "<computed-sha256>",
+  "bytes": 42000,
+  "width": 1600,
+  "height": 900
+}
+```
+
+Keep authored artifact paths as filenames in the entry directory. `template.path`
+must be `template.json`; `cover.path` must be a PNG/JPEG/WebP filename. The builder
+copies files into `dist/artifacts/<id>/<version>/` and publishes those versioned,
+catalog-relative paths. Do not add a remote origin, traversal segments, or an
+`artifacts/` prefix to authored `entry.json` paths.
 
 ---
 

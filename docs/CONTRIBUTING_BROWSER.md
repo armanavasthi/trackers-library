@@ -14,6 +14,12 @@ Save this JSON text on your computer (for example, in a text editor or Notepad) 
 
 > 💡 **Structure Note:** Each tracker should have **exactly 1 section** in its `sections` list. Use `topics` (for Study) or `patterns` (for DSA) to organize subject areas so that it fits smoothly into any user's account without hitting section limits.
 
+Study subtopics and DSA problems can each include a primary `url` and up to 20
+`resources` containing `label` and `url`. See the [complete linked example](examples/linked-workspace-template.json)
+and [link and cover requirements](../CONTRIBUTING.md). Use HTTP(S) links without
+credentials. Leave personal notes and progress out of the template. One optional
+16:9 cover image supplies both the thumbnail and detail artwork.
+
 ---
 
 ## Step 2: Fork the Repository

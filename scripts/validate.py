@@ -31,6 +31,7 @@ KEY_REGEX = re.compile(r"^[a-z0-9][a-z0-9-]{0,79}$")
 CREATOR_ID_REGEX = re.compile(r"^[a-z0-9][a-z0-9.-]{0,79}$")
 SHA256_REGEX = re.compile(r"^[a-f0-9]{64}$")
 ISO_DATE_REGEX = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$")
+HTTP_URL_REGEX = re.compile(r"^https?://[^\s/@?#\\]+(?:[/?#][^\s\\]*)?$")
 
 HTML_TAG_REGEX = re.compile(r"<\s*([a-zA-Z][a-zA-Z0-9]*)\b[^>]*>", re.IGNORECASE)
 FORBIDDEN_HTML_TAGS = {"script", "iframe", "object", "embed", "style", "form", "input", "button", "link", "meta", "base"}
@@ -53,7 +54,7 @@ ALLOWED_PACKAGE_TYPES = {"tracker", "bundle"}
 ALLOWED_TEMPLATE_KINDS = {"study-template", "dsa-template", "workspace-template"}
 ALLOWED_LEVELS = {"beginner", "intermediate", "advanced", "mixed"}
 ALLOWED_DIFFICULTIES = {"easy", "medium", "hard"}
-MAX_COVER_BYTES = 512 * 1024  # 512 KB
+MAX_COVER_BYTES = 512000  # Matches authored and published JSON Schemas.
 MAX_COVER_WIDTH = 2400
 MAX_COVER_HEIGHT = 1600
 
@@ -145,6 +146,8 @@ def scan_for_security_issues(val: Any, path: str) -> None:
         for k, v in val.items():
             if k in UNSAFE_KEYS:
                 raise ValidationError("unsafe_field", f"{path}.{k}", f"Prohibited prototype key: {k}")
+            if k in PROGRESS_KEYS:
+                raise ValidationError("forbidden_progress_field", f"{path}.{k}", "Reusable packages cannot contain personal notes, progress, or account data.")
             k_lower = k.lower()
             if any(f in k_lower for f in ("password", "password_hash", "private_key", "secret_key", "bearer_token")):
                 raise ValidationError("forbidden_field", f"{path}.{k}", f"Forbidden field detected: {k}")
@@ -285,6 +288,7 @@ def validate_template_document(template_data: Dict[str, Any]) -> Dict[str, Any]:
                     raise ValidationError("empty_subtopics", f"{tp}.subtopics", "Subtopics must be a non-empty array.")
                 for sub_idx, sub in enumerate(subtopics):
                     sub_p = f"{tp}.subtopics[{sub_idx}]"
+                    _validate_object_fields(sub, sub_p, {"key", "name", "url", "estimatedMinutes", "resources"})
                     sub_key = sub.get("key")
                     sub_name = sub.get("name")
                     if not sub_key or not isinstance(sub_key, str) or not KEY_REGEX.match(sub_key):
@@ -294,7 +298,9 @@ def validate_template_document(template_data: Dict[str, Any]) -> Dict[str, Any]:
                     study_keys[s_key].add(sub_key)
                     if not sub_name or not isinstance(sub_name, str):
                         raise ValidationError("invalid_subtopic_name", f"{sub_p}.name", "Subtopic name is required.")
-                    _validate_leaf_resources(sub.get("resources"), f"{sub_p}.resources")
+                    if "url" in sub:
+                        _validate_link_url(sub["url"], f"{sub_p}.url")
+                    _validate_leaf_resources(sub.get("resources", []), f"{sub_p}.resources")
 
     def _validate_dsa_sections(sections_raw: Any, base_path: str):
         if not isinstance(sections_raw, list) or len(sections_raw) == 0:
@@ -336,6 +342,7 @@ def validate_template_document(template_data: Dict[str, Any]) -> Dict[str, Any]:
                     raise ValidationError("empty_problems", f"{pp}.problems", "Problems must be a non-empty array.")
                 for prob_idx, prob in enumerate(problems):
                     prob_p = f"{pp}.problems[{prob_idx}]"
+                    _validate_object_fields(prob, prob_p, {"key", "name", "difficulty", "url", "estimatedMinutes", "resources"})
                     prob_key = prob.get("key")
                     prob_name = prob.get("name")
                     prob_diff = prob.get("difficulty")
@@ -348,28 +355,58 @@ def validate_template_document(template_data: Dict[str, Any]) -> Dict[str, Any]:
                         raise ValidationError("invalid_problem_name", f"{prob_p}.name", "Problem name is required.")
                     if prob_diff not in ALLOWED_DIFFICULTIES:
                         raise ValidationError("invalid_difficulty", f"{prob_p}.difficulty", f"Difficulty must be one of {sorted(ALLOWED_DIFFICULTIES)}, got '{prob_diff}'")
-                    _validate_leaf_resources(prob.get("resources"), f"{prob_p}.resources")
+                    if "url" in prob:
+                        _validate_link_url(prob["url"], f"{prob_p}.url")
+                    _validate_leaf_resources(prob.get("resources", []), f"{prob_p}.resources")
+
+    def _validate_object_fields(value: Any, path: str, allowed: Set[str]):
+        if not isinstance(value, dict):
+            raise ValidationError("invalid_type", path, "Expected an object.")
+        extra = set(value) - allowed
+        if extra:
+            field = sorted(extra)[0]
+            raise ValidationError("unknown_field", f"{path}.{field}", "This field is not part of the v1 contract.")
+
+    def _validate_link_url(url: Any, path: str):
+        if not isinstance(url, str) or not url or len(url) > 2048:
+            raise ValidationError("invalid_resource_url", path, "URL must contain 1-2048 characters.")
+        try:
+            parsed = urlparse(url)
+            valid = (
+                HTTP_URL_REGEX.fullmatch(url)
+                and parsed.scheme in {"http", "https"}
+                and parsed.hostname
+                and parsed.username is None
+                and parsed.password is None
+                and not any(char.isspace() or ord(char) < 32 or ord(char) == 127 for char in url)
+                and "\\" not in url
+            )
+            # Accessing port also validates malformed/out-of-range ports.
+            parsed.port
+        except ValueError:
+            valid = False
+        if not valid:
+            raise ValidationError("unsafe_resource_url", path, "URL must be HTTP/HTTPS with a host and without credentials or whitespace.")
 
     def _validate_leaf_resources(res_raw: Any, path: str):
-        if res_raw is None:
-            return
         if not isinstance(res_raw, list):
             raise ValidationError("invalid_resources", path, "Resources must be an array.")
         if len(res_raw) > 20:
             raise ValidationError("resource_limit_exceeded", path, "Max 20 resources allowed per item.")
+        urls: Set[str] = set()
         for r_idx, res in enumerate(res_raw):
             rp = f"{path}[{r_idx}]"
             if not isinstance(res, dict):
                 raise ValidationError("invalid_resource", rp, "Resource must be an object.")
+            _validate_object_fields(res, rp, {"label", "url"})
             label = res.get("label")
             url = res.get("url")
-            if not label or not isinstance(label, str):
-                raise ValidationError("invalid_resource_label", f"{rp}.label", "Resource label is required.")
-            if not url or not isinstance(url, str):
-                raise ValidationError("invalid_resource_url", f"{rp}.url", "Resource url is required.")
-            parsed = urlparse(url)
-            if parsed.scheme not in {"http", "https"} or not parsed.netloc or parsed.username or parsed.password:
-                raise ValidationError("unsafe_resource_url", f"{rp}.url", f"Resource URL must be a valid public HTTP/HTTPS URL: {url}")
+            if not label or not isinstance(label, str) or len(label) > 160:
+                raise ValidationError("invalid_resource_label", f"{rp}.label", "Resource label is required (1-160 characters).")
+            _validate_link_url(url, f"{rp}.url")
+            if url in urls:
+                raise ValidationError("duplicate_resource_url", f"{rp}.url", "A leaf cannot repeat the same resource URL.")
+            urls.add(url)
 
     if kind == "study-template":
         _validate_study_sections(content.get("sections"), "template.json.content.sections")
@@ -598,8 +635,8 @@ def validate_entry_package(
         c_width = cover_ref.get("width")
         c_height = cover_ref.get("height")
 
-        if not c_path or not isinstance(c_path, str):
-            raise ValidationError("invalid_cover_path", "entry.json.cover.path", "Cover path is required.")
+        if not isinstance(c_path, str) or not re.fullmatch(r"[a-zA-Z0-9_-]+\.(?:webp|png|jpe?g)", c_path):
+            raise ValidationError("invalid_cover_path", "entry.json.cover.path", "Cover path must be a PNG/JPEG/WebP filename in the entry directory.")
         if not c_alt or not isinstance(c_alt, str) or len(c_alt) > 200:
             raise ValidationError("invalid_cover_alt", "entry.json.cover.alt", "Cover alt text is required (1-200 chars).")
 

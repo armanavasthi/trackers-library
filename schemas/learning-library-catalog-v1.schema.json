@@ -160,7 +160,8 @@
       "properties": {
         "totalEntries": { "type": "integer", "minimum": 1 },
         "durationDays": { "type": "integer", "minimum": 1, "maximum": 366 },
-        "estimatedMinutes": { "type": "integer", "minimum": 0 }
+        "estimatedMinutes": { "type": "integer", "minimum": 0 },
+        "inheritedEstimates": { "type": "integer", "minimum": 0 }
       }
     },
     "publishedCover": {
@@ -168,7 +169,7 @@
       "additionalProperties": false,
       "required": ["path", "alt", "sha256", "bytes", "width", "height"],
       "properties": {
-        "path": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "path": { "type": "string", "minLength": 1, "maxLength": 512, "pattern": "^(?:artifacts/[a-z0-9][a-z0-9-]{0,79}/\\d+\\.\\d+\\.\\d+(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?/)?[a-zA-Z0-9_-]+\\.(?:webp|png|jpe?g)$" },
         "alt": { "type": "string", "minLength": 1, "maxLength": 200 },
         "sha256": { "$ref": "#/$defs/sha256" },
         "bytes": { "type": "integer", "minimum": 1, "maximum": 512000 },
@@ -181,7 +182,7 @@
       "additionalProperties": false,
       "required": ["path", "sha256", "bytes"],
       "properties": {
-        "path": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "path": { "type": "string", "minLength": 1, "maxLength": 512, "pattern": "^(?:artifacts/[a-z0-9][a-z0-9-]{0,79}/\\d+\\.\\d+\\.\\d+(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?/)?template\\.json$" },
         "sha256": { "$ref": "#/$defs/sha256" },
         "bytes": { "type": "integer", "minimum": 1, "maximum": 2097152 }
       }

@@ -1,0 +1,75 @@
+{
+  "$schema": "https://trackers.example/schemas/trackers-template-v1.json",
+  "schemaVersion": 1,
+  "kind": "workspace-template",
+  "metadata": {
+    "id": "linked-learning",
+    "version": "1.0.0",
+    "title": "Linked Study and DSA Foundations"
+  },
+  "content": {
+    "study": {
+      "sections": [
+        {
+          "key": "study",
+          "name": "Study Foundations",
+          "topics": [
+            {
+              "key": "data-structures",
+              "name": "Data Structures",
+              "subtopics": [
+                {
+                  "key": "hash-tables",
+                  "name": "Hash tables",
+                  "url": "https://en.wikipedia.org/wiki/Hash_table",
+                  "resources": [
+                    {
+                      "label": "Python dictionaries",
+                      "url": "https://docs.python.org/3/tutorial/datastructures.html#dictionaries"
+                    },
+                    {
+                      "label": "Java Map reference",
+                      "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Map.html"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "dsa": {
+      "sections": [
+        {
+          "key": "dsa",
+          "name": "DSA Foundations",
+          "patterns": [
+            {
+              "key": "lookup",
+              "name": "Fast lookups",
+              "problems": [
+                {
+                  "key": "two-sum",
+                  "name": "Two Sum",
+                  "difficulty": "easy",
+                  "url": "https://leetcode.com/problems/two-sum/",
+                  "resources": [
+                    {
+                      "label": "Hash table background",
+                      "url": "https://en.wikipedia.org/wiki/Hash_table"
+                    },
+                    {
+                      "label": "Python dictionaries",
+                      "url": "https://docs.python.org/3/library/stdtypes.html#mapping-types-dict"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

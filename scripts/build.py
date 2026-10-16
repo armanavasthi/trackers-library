@@ -29,6 +29,14 @@ from validate import (
 )
 
 
+def count_leaf_links(leaf: Dict[str, Any]) -> int:
+    """Count distinct primary and labelled URLs for one curriculum item."""
+    urls = {resource["url"] for resource in leaf.get("resources", [])}
+    if leaf.get("url"):
+        urls.add(leaf["url"])
+    return len(urls)
+
+
 def compute_content_counts(template: Dict[str, Any]) -> Tuple[Dict[str, int], Optional[Dict[str, int]]]:
     """Compute normalized content counts and optional plan summary from a validated template."""
     kind = template.get("kind")
@@ -49,7 +57,7 @@ def compute_content_counts(template: Dict[str, Any]) -> Tuple[Dict[str, int], Op
                 subtopics = t.get("subtopics", [])
                 leaves_count += len(subtopics)
                 for sub in subtopics:
-                    resources_count += len(sub.get("resources", []))
+                    resources_count += count_leaf_links(sub)
 
     elif kind == "dsa-template":
         dsa_sections = content.get("sections", [])
@@ -61,7 +69,7 @@ def compute_content_counts(template: Dict[str, Any]) -> Tuple[Dict[str, int], Op
                 problems = p.get("problems", [])
                 leaves_count += len(problems)
                 for prob in problems:
-                    resources_count += len(prob.get("resources", []))
+                    resources_count += count_leaf_links(prob)
 
     elif kind == "workspace-template":
         study_sections = (content.get("study") or {}).get("sections", [])
@@ -73,7 +81,7 @@ def compute_content_counts(template: Dict[str, Any]) -> Tuple[Dict[str, int], Op
                 subtopics = t.get("subtopics", [])
                 leaves_count += len(subtopics)
                 for sub in subtopics:
-                    resources_count += len(sub.get("resources", []))
+                    resources_count += count_leaf_links(sub)
 
         dsa_sections = (content.get("dsa") or {}).get("sections", [])
         sections_count += len(dsa_sections)
@@ -84,7 +92,7 @@ def compute_content_counts(template: Dict[str, Any]) -> Tuple[Dict[str, int], Op
                 problems = p.get("problems", [])
                 leaves_count += len(problems)
                 for prob in problems:
-                    resources_count += len(prob.get("resources", []))
+                    resources_count += count_leaf_links(prob)
 
     counts = {
         "sections": sections_count,
@@ -169,7 +177,7 @@ def build_catalog(repo_root: Path, dist_dir: Path, schema_base_url: str = "https
 
         # Copy template.json
         shutil.copy2(entry_dir / "template.json", target_art_dir / "template.json")
-        rel_template_path = entry["template"]["path"]
+        rel_template_path = f"artifacts/{entry_id}/{version}/{entry['template']['path']}"
 
         # Copy cover if present
         published_cover = None
@@ -177,7 +185,7 @@ def build_catalog(repo_root: Path, dist_dir: Path, schema_base_url: str = "https
             shutil.copy2(cover_file, target_art_dir / cover_file.name)
             cov_meta = entry["cover"]
             published_cover = {
-                "path": cov_meta["path"],
+                "path": f"artifacts/{entry_id}/{version}/{cov_meta['path']}",
                 "alt": cov_meta["alt"],
                 "sha256": cov_meta["sha256"],
                 "bytes": cov_meta["bytes"],
