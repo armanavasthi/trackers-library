@@ -108,4 +108,4 @@ Every curriculum needs a companion `entry.json` that provides the title, author 
 * In about 1 minute, you will see either:
   * ✅ **All checks have passed** (Green checkmark): Everything is perfectly formatted! The maintainers will review and merge it.
   * ❌ **Some checks were not successful** (Red X): Click on **Details** to see what needs adjusting (such as correcting the SHA-256 hash or fixing a typo).
-* Once merged, your track will be automatically published and become visible to all Trackers users worldwide!
+* Once merged, your track will be automatically published and become visible to all Trackers users worldwide within **24 hours**!

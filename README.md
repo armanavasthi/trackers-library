@@ -84,14 +84,11 @@ You don't need to install Git, Python, or open a terminal! You can submit a curr
 
 ---
 
-## 🛡️ Automated Quality & Security Gate
+## ⏱️ Review & Publication Process
 
-Every Pull Request is tested automatically by GitHub Actions to guarantee high quality and minimal human review:
-
-1. **Schema Validation:** Strict conformance against `trackers-template-v1` and `learning-library-entry-v1`.
-2. **Cryptographic Integrity:** SHA-256 hashes and byte lengths must match files exactly.
-3. **Zero Secrets / Zero XSS:** Content is scanned to block passwords, tokens, API keys, and unsafe raw HTML tags.
-4. **Immutability:** Once a version (e.g. `1.0.0`) is published, it cannot be edited or deleted—updates require incrementing the semver (e.g. `1.0.1` or `1.1.0`).
+1. **Automated Checks:** When you submit a Pull Request, automated tests will verify your files within a few minutes.
+2. **Review & Approval:** Our team will review the submitted curriculum.
+3. **Live in Library:** Once your Pull Request is approved and merged, the new sheet will automatically be processed and become available in the Trackers in-app library within **24 hours**.
 
 ---
 
