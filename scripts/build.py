@@ -169,17 +169,15 @@ def build_catalog(repo_root: Path, dist_dir: Path, schema_base_url: str = "https
 
         # Copy template.json
         shutil.copy2(entry_dir / "template.json", target_art_dir / "template.json")
-        rel_template_path = f"artifacts/{entry_id}/{version}/template.json"
+        rel_template_path = entry["template"]["path"]
 
         # Copy cover if present
-        rel_cover_path = None
         published_cover = None
         if cover_file and cover_file.exists():
             shutil.copy2(cover_file, target_art_dir / cover_file.name)
-            rel_cover_path = f"artifacts/{entry_id}/{version}/{cover_file.name}"
             cov_meta = entry["cover"]
             published_cover = {
-                "path": rel_cover_path,
+                "path": cov_meta["path"],
                 "alt": cov_meta["alt"],
                 "sha256": cov_meta["sha256"],
                 "bytes": cov_meta["bytes"],
