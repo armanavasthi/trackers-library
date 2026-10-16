@@ -239,7 +239,112 @@ def build_catalog(repo_root: Path, dist_dir: Path, schema_base_url: str = "https
     catalog_file = dist_dir / "catalog-v1.json"
     catalog_file.write_text(json.dumps(catalog_doc, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
-    print(f"\n✨ Successfully compiled {len(published_entries)} catalog entries to {catalog_file}!")
+    # 6. Generate friendly index.html landing page for root URL
+    html_cards = []
+    for e in published_entries:
+        cat_badges = "".join(f'<span class="badge">{cid}</span>' for cid in e.get("categoryIds", []))
+        art_path = f"artifacts/{e['id']}/{e['version']}/template.json"
+        html_cards.append(f"""
+        <div class="card">
+          <div class="card-head">
+            <h3>{e['title']}</h3>
+            <span class="version">v{e['version']}</span>
+          </div>
+          <p class="summary">{e['summary']}</p>
+          <div class="meta">
+            <span class="pill">{e['templateKind']}</span>
+            <span class="pill">{e.get('estimatedWeeks', 4)} weeks</span>
+            {cat_badges}
+          </div>
+          <div class="card-foot">
+            <a class="btn" href="{art_path}" target="_blank">View Template Artifact (JSON) &rarr;</a>
+          </div>
+        </div>
+        """)
+
+    index_html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trackers Community Library</title>
+  <style>
+    :root {{
+      --bg: #090d16;
+      --card-bg: #131b2e;
+      --border: #23314d;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --primary: #38bdf8;
+      --primary-hover: #0284c7;
+      --badge-bg: #1e293b;
+    }}
+    * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+    body {{
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      padding: 40px 20px;
+      line-height: 1.6;
+    }}
+    .container {{ max-width: 900px; margin: 0 auto; }}
+    header {{ margin-bottom: 40px; text-align: center; }}
+    h1 {{ font-size: 2.2rem; font-weight: 700; margin-bottom: 8px; color: #fff; }}
+    p.lead {{ color: var(--muted); font-size: 1.1rem; max-width: 600px; margin: 0 auto 20px; }}
+    .actions {{ display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 40px; }}
+    a.action-link {{
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 16px; border-radius: 8px; font-weight: 500; font-size: 0.95rem; text-decoration: none;
+      background: var(--card-bg); color: var(--text); border: 1px solid var(--border); transition: all 0.15s;
+    }}
+    a.action-link:hover {{ border-color: var(--primary); color: var(--primary); }}
+    a.action-link.primary {{ background: var(--primary); color: #090d16; border-color: var(--primary); font-weight: 600; }}
+    a.action-link.primary:hover {{ background: var(--primary-hover); border-color: var(--primary-hover); color: #fff; }}
+    .grid {{ display: flex; flex-direction: column; gap: 20px; }}
+    .card {{
+      background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+      padding: 24px; transition: border-color 0.15s;
+    }}
+    .card:hover {{ border-color: #3b82f6; }}
+    .card-head {{ display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 10px; }}
+    .card-head h3 {{ font-size: 1.25rem; font-weight: 600; color: #fff; }}
+    .version {{ font-size: 0.85rem; font-family: monospace; background: var(--badge-bg); padding: 2px 8px; border-radius: 4px; color: var(--muted); }}
+    p.summary {{ color: var(--muted); margin-bottom: 16px; font-size: 0.95rem; }}
+    .meta {{ display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }}
+    .pill {{ font-size: 0.8rem; background: #0f172a; border: 1px solid var(--border); padding: 3px 10px; border-radius: 999px; color: #cbd5e1; }}
+    .badge {{ font-size: 0.8rem; background: rgba(56, 189, 248, 0.12); color: var(--primary); padding: 3px 10px; border-radius: 999px; }}
+    .card-foot {{ display: flex; justify-content: flex-end; }}
+    a.btn {{
+      font-size: 0.9rem; font-weight: 500; color: var(--primary); text-decoration: none;
+    }}
+    a.btn:hover {{ text-decoration: underline; }}
+    footer {{ margin-top: 60px; text-align: center; color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--border); padding-top: 24px; }}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Trackers Community Library</h1>
+      <p class="lead">Curated public curriculum catalog and static artifact distribution for the Trackers application.</p>
+      <div class="actions">
+        <a class="action-link primary" href="catalog-v1.json" target="_blank">📦 View catalog-v1.json Manifest</a>
+        <a class="action-link" href="categories.json" target="_blank">🏷️ Categories</a>
+        <a class="action-link" href="https://github.com/armanavasthi/trackers-library" target="_blank">⭐ GitHub Repository</a>
+      </div>
+    </header>
+    <main class="grid">
+      {''.join(html_cards)}
+    </main>
+    <footer>
+      <p>Published automatically via GitHub Actions &bull; <a href="https://github.com/armanavasthi/trackers-library" style="color:var(--muted)">Trackers Library GitHub</a></p>
+    </footer>
+  </div>
+</body>
+</html>
+"""
+    (dist_dir / "index.html").write_text(index_html, encoding="utf-8")
+
+    print(f"\n✨ Successfully compiled {len(published_entries)} catalog entries and index.html to {dist_dir}!")
 
 
 def main():
