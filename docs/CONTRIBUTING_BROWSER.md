@@ -12,6 +12,8 @@ You need the JSON file for your curriculum (e.g. from the Trackers AI Prompt Bui
 
 Save this JSON text on your computer (for example, in a text editor or Notepad) so you have it ready to paste.
 
+> 💡 **Structure Note:** Each tracker should have **exactly 1 section** in its `sections` list. Use `topics` (for Study) or `patterns` (for DSA) to organize subject areas so that it fits smoothly into any user's account without hitting section limits.
+
 ---
 
 ## Step 2: Fork the Repository

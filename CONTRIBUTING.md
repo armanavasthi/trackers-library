@@ -33,6 +33,9 @@ Your `template.json` is a reusable Trackers template (`schemaVersion: 1`).
   - `study-template`: Structured study tracker (topics, subtopics, study resources).
   - `dsa-template`: Problem-solving tracker with difficulty ratings (`easy`, `medium`, `hard`).
   - `workspace-template`: Complete learning bundle (combining study tracks, DSA tracks, and an optional Day 1–Day N milestone plan).
+- **Single Section Structure**:
+  - Each tracker (`study-template` or `dsa-template`) must have **exactly 1 section** in `content.sections`.
+  - Use `topics` (Study) or `patterns` (DSA) to organize major domains and problem categories so installed tracks fit cleanly into users' accounts without hitting section capacity limits.
 - **Cleanliness**:
   - Reusable templates must **never** contain personal account data or progress states (`status`, `confidence`, `history`, `preferences`, `storagePath`).
   - All resource URLs must be valid, publicly accessible HTTPS/HTTP links.

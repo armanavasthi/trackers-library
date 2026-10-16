@@ -248,6 +248,8 @@ def validate_template_document(template_data: Dict[str, Any]) -> Dict[str, Any]:
     def _validate_study_sections(sections_raw: Any, base_path: str):
         if not isinstance(sections_raw, list) or len(sections_raw) == 0:
             raise ValidationError("empty_study_sections", base_path, "Study content must have non-empty sections.")
+        if len(sections_raw) > 1:
+            raise ValidationError("multiple_sections_prohibited", base_path, f"Tracker curriculum must contain exactly 1 section (found {len(sections_raw)}). This ensures it fits within user account section caps. Use topics to organize major subject domains.")
         section_keys: Set[str] = set()
         for s_idx, sec in enumerate(sections_raw):
             sp = f"{base_path}[{s_idx}]"
@@ -297,6 +299,8 @@ def validate_template_document(template_data: Dict[str, Any]) -> Dict[str, Any]:
     def _validate_dsa_sections(sections_raw: Any, base_path: str):
         if not isinstance(sections_raw, list) or len(sections_raw) == 0:
             raise ValidationError("empty_dsa_sections", base_path, "DSA content must have non-empty sections.")
+        if len(sections_raw) > 1:
+            raise ValidationError("multiple_sections_prohibited", base_path, f"DSA sheet must contain exactly 1 section (found {len(sections_raw)}). This ensures it fits within user account section caps. Use patterns to organize problem categories.")
         section_keys: Set[str] = set()
         for s_idx, sec in enumerate(sections_raw):
             sp = f"{base_path}[{s_idx}]"

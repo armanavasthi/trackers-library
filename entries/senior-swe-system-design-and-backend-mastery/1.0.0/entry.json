@@ -38,8 +38,8 @@
   },
   "template": {
     "path": "template.json",
-    "sha256": "7ad74f6ace3ce894b79b10c641b2731aa32fd45ec7ccad03c0c2a9c89e9549e6",
-    "bytes": 16630
+    "sha256": "0b2d088a5bb362385628cf62f96d53580e2fd119553c100cc52e73aa368d87e0",
+    "bytes": 15833
   },
   "publishedAt": "2026-10-16T00:00:00Z",
   "updatedAt": "2026-10-16T00:00:00Z"

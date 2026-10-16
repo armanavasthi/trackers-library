@@ -23,8 +23,8 @@
   "content": {
     "sections": [
       {
-        "key": "java-jvm-concurrency-internals",
-        "name": "Java and JVM Internals for Senior Roles",
+        "key": "senior-swe-backend-system-design",
+        "name": "Senior SWE: System Design & Java Backend",
         "topics": [
           {
             "key": "jvm-memory-and-gc",
@@ -88,13 +88,7 @@
                 "estimatedMinutes": 75
               }
             ]
-          }
-        ]
-      },
-      {
-        "key": "networking-storage-and-data-internals",
-        "name": "Networking and Storage Engine Foundations",
-        "topics": [
+          },
           {
             "key": "network-protocols-and-api-paradigms",
             "name": "Network Protocols and Service Communication",
@@ -152,13 +146,7 @@
                 "estimatedMinutes": 75
               }
             ]
-          }
-        ]
-      },
-      {
-        "key": "distributed-systems-core-primitives",
-        "name": "Distributed Systems Core Primitives",
-        "topics": [
+          },
           {
             "key": "replication-and-consistency-models",
             "name": "Replication Topologies and Consistency Models",
@@ -216,13 +204,7 @@
                 "estimatedMinutes": 90
               }
             ]
-          }
-        ]
-      },
-      {
-        "key": "scalable-system-building-blocks",
-        "name": "Scalable System Building Blocks",
-        "topics": [
+          },
           {
             "key": "caching-architectures",
             "name": "Multi-Tier Caching Architectures",
@@ -285,13 +267,7 @@
                 "estimatedMinutes": 75
               }
             ]
-          }
-        ]
-      },
-      {
-        "key": "canonical-system-design-case-studies",
-        "name": "Canonical System Design Architectures",
-        "topics": [
+          },
           {
             "key": "core-infrastructure-services",
             "name": "Core Infrastructure and Coordination Systems",
@@ -354,13 +330,7 @@
                 "estimatedMinutes": 90
               }
             ]
-          }
-        ]
-      },
-      {
-        "key": "senior-interview-execution-and-leadership",
-        "name": "Senior Interview Execution and Technical Leadership",
-        "topics": [
+          },
           {
             "key": "system-design-communication-framework",
             "name": "Structuring the 45-Minute System Design Interview",
