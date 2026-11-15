@@ -9,12 +9,14 @@ import struct
 import sys
 import tempfile
 import unittest
+from types import SimpleNamespace
+from unittest.mock import patch
 import zlib
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 from build import build_catalog, compute_content_counts
-from validate import ValidationError, validate_categories_file, validate_entry_package, validate_template_document
+from validate import RETIRED_DEMO_FILES, ValidationError, check_version_immutability, validate_categories_file, validate_entry_package, validate_template_document
 
 
 def example():
@@ -41,6 +43,28 @@ def png_bytes(width=160, height=90):
 
 
 class LibraryContractTests(unittest.TestCase):
+    def test_only_exact_retired_demo_deletions_bypass_immutability(self):
+        for filepath in RETIRED_DEMO_FILES:
+            with self.subTest(filepath=filepath), patch('validate.subprocess.run', side_effect=[
+                SimpleNamespace(returncode=0),
+                SimpleNamespace(returncode=0, stdout=f'D\t{filepath}\n'),
+            ]):
+                check_version_immutability(ROOT)
+        for status, filepath in (
+            ('M', next(iter(RETIRED_DEMO_FILES))),
+            ('D', 'entries/senior-swe-system-design-and-backend-mastery/1.0.0/template.json'),
+            ('D', 'entries/dsa-fundamentals/1.0.1/template.json'),
+            ('D', 'entries/dsa-fundamentals/1.0.0/cover.png'),
+        ):
+            with self.subTest(status=status, filepath=filepath), patch('validate.subprocess.run', side_effect=[
+                SimpleNamespace(returncode=0),
+                SimpleNamespace(returncode=0, stdout=f'{status}\t{filepath}\n'),
+                SimpleNamespace(returncode=0),
+            ]):
+                with self.assertRaises(ValidationError) as failure:
+                    check_version_immutability(ROOT)
+                self.assertEqual(failure.exception.code, 'immutable_version_modified')
+
     def test_study_dsa_and_workspace_accept_primary_and_all_labelled_links(self):
         template = example()
         self.assertIs(validate_template_document(template), template)

@@ -58,6 +58,15 @@ MAX_COVER_BYTES = 512000  # Matches authored and published JSON Schemas.
 MAX_COVER_WIDTH = 2400
 MAX_COVER_HEIGHT = 1600
 
+# Owner-approved removal of the two testing packages from the production
+# catalog. Only these exact deletions are exempt; edits and real published
+# package deletions remain forbidden. Do not expand this into a general bypass.
+RETIRED_DEMO_FILES = frozenset(
+    f"entries/{identifier}/1.0.0/{filename}"
+    for identifier in ("dsa-fundamentals", "software-engineering-fundamentals")
+    for filename in ("entry.json", "template.json")
+)
+
 
 class ValidationError(Exception):
     def __init__(self, code: str, path: str, message: str):
@@ -699,6 +708,8 @@ def check_version_immutability(repo_root: Path, base_ref: str = "origin/main") -
             if len(parts) != 2:
                 continue
             status, filepath = parts[0], parts[1]
+            if status == "D" and filepath in RETIRED_DEMO_FILES:
+                continue
             if filepath.startswith("entries/") and (status.startswith("M") or status.startswith("D")):
                 entry_parts = Path(filepath).parts
                 if len(entry_parts) >= 3:

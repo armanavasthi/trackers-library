@@ -2,6 +2,12 @@
 
 The official community-driven catalog of curated learning tracks, system design curricula, and DSA problem sets for **[Trackers](https://github.com/armanavasthi/trackers)**.
 
+The former `dsa-fundamentals` and `software-engineering-fundamentals` 1.0.0
+packages were testing samples and have been removed from publication. Their
+sample data belongs only in the application's test fixtures. The validator
+allows deletion of those four exact sample files; all other published-version
+immutability checks still apply.
+
 Any track merged into this repository is automatically built, cryptographically verified, and published to GitHub Pages to be served directly inside the Trackers application.
 
 ---
