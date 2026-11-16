@@ -53,6 +53,7 @@
                   "key": "two-sum",
                   "name": "Two Sum",
                   "difficulty": "easy",
+                  "sub": "Hash map lookup",
                   "url": "https://leetcode.com/problems/two-sum/",
                   "resources": [
                     {

@@ -20,6 +20,12 @@ and [link and cover requirements](../CONTRIBUTING.md). Use HTTP(S) links without
 credentials. Leave personal notes and progress out of the template. One optional
 16:9 cover image supplies both the thumbnail and detail artwork.
 
+DSA problems may also include optional `"sub": "Hash map lookup"` for a
+sub-pattern. Use 1–200 Unicode characters with at least one non-whitespace
+character, or omit the field. Do not use `null` or an empty string. This remains
+`schemaVersion: 1` and works in DSA-only and workspace templates. Deploy the
+updated TrackSpace importer before publishing a template that uses this field.
+
 ---
 
 ## Step 2: Fork the Repository

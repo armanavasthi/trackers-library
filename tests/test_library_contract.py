@@ -43,6 +43,72 @@ def png_bytes(width=160, height=90):
 
 
 class LibraryContractTests(unittest.TestCase):
+    def test_published_templates_reject_malformed_fields_before_install(self):
+        problem = ("content", "dsa", "sections", 0, "patterns", 0, "problems", 0)
+        topic = ("content", "study", "sections", 0, "topics", 0)
+        cases = [
+            (("kind",), []), (("schemaVersion",), True), (("unexpected",), True),
+            (("metadata", "title"), "   "), (("metadata", "unexpected"), True),
+            (("content", "study"), None), (topic, 3),
+            (topic + ("name",), "   "),
+            (problem + ("difficulty",), []),
+            (problem + ("name",), "x" * 161),
+        ]
+        for value in (None, True, 0, -1, 1.5, 1441):
+            cases.append((problem + ("estimatedMinutes",), value))
+        for path, value in cases:
+            template = example()
+            target = template
+            for key in path[:-1]: target = target[key]
+            target[path[-1]] = value
+            with self.subTest(path=path, value=value), self.assertRaises(ValidationError):
+                validate_template_document(template)
+
+    def test_dsa_difficulty_can_be_omitted_like_the_app_contract(self):
+        template = example()
+        del leaves(template)[1]["difficulty"]
+        self.assertIs(validate_template_document(template), template)
+
+    def test_bundled_planner_contract_rejects_bad_or_duplicate_entries(self):
+        entry = {"tracker": "study", "sectionKey": "study", "itemKey": "hash-tables", "dayOffset": 0}
+        template = example()
+        template["content"]["plan"] = {"anchor": "user-selected-start-date", "entries": [entry]}
+        self.assertIs(validate_template_document(template), template)
+        for field, value in (("dayOffset", -1), ("dayOffset", True), ("dayOffset", 366), ("tracker", []), ("estimatedMinutes", 0), ("note", "")):
+            invalid = copy.deepcopy(template)
+            invalid["content"]["plan"]["entries"][0][field] = value
+            with self.subTest(field=field, value=value), self.assertRaises(ValidationError):
+                validate_template_document(invalid)
+        template["content"]["plan"]["entries"].append(copy.deepcopy(entry))
+        with self.assertRaises(ValidationError) as failure:
+            validate_template_document(template)
+        self.assertEqual(failure.exception.code, "duplicate_plan_entry")
+
+    def test_optional_dsa_sub_pattern_in_standalone_and_workspace(self):
+        for sub in ("Sliding Window", "x" * 200, "😀" * 200):
+            template = example()
+            leaves(template)[1]["sub"] = sub
+            with self.subTest(sub=sub):
+                self.assertIs(validate_template_document(template), template)
+                template["kind"] = "dsa-template"
+                template["content"] = template["content"]["dsa"]
+                self.assertIs(validate_template_document(template), template)
+
+    def test_invalid_dsa_sub_pattern_is_rejected(self):
+        for sub in (None, 3, True, [], {}, "", "   ", "x" * 201, "😀" * 201):
+            template = example()
+            leaves(template)[1]["sub"] = sub
+            with self.subTest(sub=sub), self.assertRaises(ValidationError) as failure:
+                validate_template_document(template)
+            self.assertEqual(failure.exception.code, "invalid_sub_pattern")
+
+    def test_sub_pattern_is_not_a_study_field(self):
+        template = example()
+        leaves(template)[0]["sub"] = "Sliding Window"
+        with self.assertRaises(ValidationError) as failure:
+            validate_template_document(template)
+        self.assertEqual(failure.exception.code, "unknown_field")
+
     def test_only_exact_retired_demo_deletions_bypass_immutability(self):
         for filepath in RETIRED_DEMO_FILES:
             with self.subTest(filepath=filepath), patch('validate.subprocess.run', side_effect=[

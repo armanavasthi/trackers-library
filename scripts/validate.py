@@ -223,13 +223,34 @@ def validate_template_document(template_data: Dict[str, Any]) -> Dict[str, Any]:
     if not isinstance(template_data, dict):
         raise ValidationError("invalid_template_root", "template.json", "Template must be a JSON object.")
 
+    def _validate_object_fields(value: Any, path: str, allowed: Set[str]):
+        if not isinstance(value, dict):
+            raise ValidationError("invalid_type", path, "Expected an object.")
+        extra = set(value) - allowed
+        if extra:
+            field = sorted(extra)[0]
+            raise ValidationError("unknown_field", f"{path}.{field}", "This field is not part of the v1 contract.")
+
+    def _text(value, path, maximum=160):
+        if not isinstance(value, str) or not value.strip() or len(value) > maximum:
+            raise ValidationError("invalid_text", path, f"Use a non-blank string of at most {maximum} characters.")
+
+    def _minutes(leaf, path):
+        if "estimatedMinutes" in leaf and (type(leaf["estimatedMinutes"]) is not int or not 1 <= leaf["estimatedMinutes"] <= 1440):
+            raise ValidationError("invalid_estimate", f"{path}.estimatedMinutes", "Use an integer from 1 through 1440.")
+
+    _validate_object_fields(template_data, "template.json", {"$schema", "schemaVersion", "kind", "metadata", "content"})
+    if not isinstance(template_data.get("$schema"), str) or not re.fullmatch(r"https://.+/schemas/trackers-template-v1\.json", template_data["$schema"]):
+        raise ValidationError("invalid_schema", "template.json.$schema", "Use the reusable-template v1 schema identifier.")
+    if len(json.dumps(template_data, ensure_ascii=False).encode()) > 2 * 1024 * 1024:
+        raise ValidationError("template_too_large", "template.json", "Template must fit within 2 MiB.")
     # 1. Schema version
-    if template_data.get("schemaVersion") != 1:
+    if type(template_data.get("schemaVersion")) is not int or template_data["schemaVersion"] != 1:
         raise ValidationError("invalid_schema_version", "template.json.schemaVersion", "schemaVersion must be 1.")
 
     # 2. Kind
     kind = template_data.get("kind")
-    if kind not in ALLOWED_TEMPLATE_KINDS:
+    if not isinstance(kind, str) or kind not in ALLOWED_TEMPLATE_KINDS:
         raise ValidationError("invalid_template_kind", "template.json.kind", f"kind must be one of {sorted(ALLOWED_TEMPLATE_KINDS)}")
 
     # 3. Metadata
@@ -237,6 +258,16 @@ def validate_template_document(template_data: Dict[str, Any]) -> Dict[str, Any]:
     if not isinstance(meta, dict):
         raise ValidationError("invalid_template_metadata", "template.json.metadata", "metadata object is required.")
 
+    _validate_object_fields(meta, "template.json.metadata", {"id", "version", "title", "description", "levels", "subjects", "estimatedWeeks", "author", "license"})
+    for key in ("description", "author", "license"):
+        if key in meta: _text(meta[key], f"template.json.metadata.{key}", 2000 if key == "description" else 160)
+    for key in ("levels", "subjects"):
+        if key in meta:
+            if not isinstance(meta[key], list) or len(meta[key]) > 20 or any(not isinstance(tag, str) or not KEY_REGEX.fullmatch(tag) for tag in meta[key]):
+                raise ValidationError("invalid_tags", f"template.json.metadata.{key}", "Use at most 20 logical keys.")
+    if "estimatedWeeks" in meta and (type(meta["estimatedWeeks"]) is not int or not 1 <= meta["estimatedWeeks"] <= 520):
+        raise ValidationError("invalid_estimate", "template.json.metadata.estimatedWeeks", "Use 1–520 weeks.")
+    _text(meta.get("title"), "template.json.metadata.title")
     template_id = meta.get("id")
     template_version = meta.get("version")
     template_title = meta.get("title")
@@ -253,6 +284,8 @@ def validate_template_document(template_data: Dict[str, Any]) -> Dict[str, Any]:
     if not isinstance(content, dict):
         raise ValidationError("invalid_template_content", "template.json.content", "content object is required.")
 
+    _validate_object_fields(content, "template.json.content", {"study", "dsa", "plan"} if kind == "workspace-template" else {"sections"})
+    counts = {"study": 0, "dsa": 0, "leaves": 0}
     # Validate sections according to kind
     study_keys: Dict[str, Set[str]] = {}
     dsa_keys: Dict[str, Set[str]] = {}
@@ -267,6 +300,8 @@ def validate_template_document(template_data: Dict[str, Any]) -> Dict[str, Any]:
             sp = f"{base_path}[{s_idx}]"
             if not isinstance(sec, dict):
                 raise ValidationError("invalid_section", sp, "Section must be an object.")
+            _validate_object_fields(sec, sp, {"key", "name", "topics"})
+            _text(sec.get("name"), f"{sp}.name")
             s_key = sec.get("key")
             s_name = sec.get("name")
             if not s_key or not isinstance(s_key, str) or not KEY_REGEX.match(s_key):
@@ -284,6 +319,9 @@ def validate_template_document(template_data: Dict[str, Any]) -> Dict[str, Any]:
             topic_keys: Set[str] = set()
             for t_idx, top in enumerate(topics):
                 tp = f"{sp}.topics[{t_idx}]"
+                _validate_object_fields(top, tp, {"key", "name", "subtopics"})
+                _text(top.get("name"), f"{tp}.name")
+                counts["study"] += 1
                 t_key = top.get("key")
                 t_name = top.get("name")
                 if not t_key or not isinstance(t_key, str) or not KEY_REGEX.match(t_key):
@@ -298,6 +336,9 @@ def validate_template_document(template_data: Dict[str, Any]) -> Dict[str, Any]:
                 for sub_idx, sub in enumerate(subtopics):
                     sub_p = f"{tp}.subtopics[{sub_idx}]"
                     _validate_object_fields(sub, sub_p, {"key", "name", "url", "estimatedMinutes", "resources"})
+                    counts["leaves"] += 1
+                    _text(sub.get("name"), f"{sub_p}.name")
+                    _minutes(sub, sub_p)
                     sub_key = sub.get("key")
                     sub_name = sub.get("name")
                     if not sub_key or not isinstance(sub_key, str) or not KEY_REGEX.match(sub_key):
@@ -321,6 +362,8 @@ def validate_template_document(template_data: Dict[str, Any]) -> Dict[str, Any]:
             sp = f"{base_path}[{s_idx}]"
             if not isinstance(sec, dict):
                 raise ValidationError("invalid_section", sp, "Section must be an object.")
+            _validate_object_fields(sec, sp, {"key", "name", "patterns"})
+            _text(sec.get("name"), f"{sp}.name")
             s_key = sec.get("key")
             s_name = sec.get("name")
             if not s_key or not isinstance(s_key, str) or not KEY_REGEX.match(s_key):
@@ -338,6 +381,9 @@ def validate_template_document(template_data: Dict[str, Any]) -> Dict[str, Any]:
             pattern_keys: Set[str] = set()
             for p_idx, pat in enumerate(patterns):
                 pp = f"{sp}.patterns[{p_idx}]"
+                _validate_object_fields(pat, pp, {"key", "name", "problems"})
+                _text(pat.get("name"), f"{pp}.name")
+                counts["dsa"] += 1
                 p_key = pat.get("key")
                 p_name = pat.get("name")
                 if not p_key or not isinstance(p_key, str) or not KEY_REGEX.match(p_key):
@@ -351,7 +397,10 @@ def validate_template_document(template_data: Dict[str, Any]) -> Dict[str, Any]:
                     raise ValidationError("empty_problems", f"{pp}.problems", "Problems must be a non-empty array.")
                 for prob_idx, prob in enumerate(problems):
                     prob_p = f"{pp}.problems[{prob_idx}]"
-                    _validate_object_fields(prob, prob_p, {"key", "name", "difficulty", "url", "estimatedMinutes", "resources"})
+                    _validate_object_fields(prob, prob_p, {"key", "name", "difficulty", "sub", "url", "estimatedMinutes", "resources"})
+                    counts["leaves"] += 1
+                    _text(prob.get("name"), f"{prob_p}.name")
+                    _minutes(prob, prob_p)
                     prob_key = prob.get("key")
                     prob_name = prob.get("name")
                     prob_diff = prob.get("difficulty")
@@ -362,19 +411,15 @@ def validate_template_document(template_data: Dict[str, Any]) -> Dict[str, Any]:
                     dsa_keys[s_key].add(prob_key)
                     if not prob_name or not isinstance(prob_name, str):
                         raise ValidationError("invalid_problem_name", f"{prob_p}.name", "Problem name is required.")
-                    if prob_diff not in ALLOWED_DIFFICULTIES:
+                    if "difficulty" in prob and (not isinstance(prob_diff, str) or prob_diff not in ALLOWED_DIFFICULTIES):
                         raise ValidationError("invalid_difficulty", f"{prob_p}.difficulty", f"Difficulty must be one of {sorted(ALLOWED_DIFFICULTIES)}, got '{prob_diff}'")
+                    if "sub" in prob:
+                        sub = prob["sub"]
+                        if not isinstance(sub, str) or not sub.strip() or len(sub) > 200:
+                            raise ValidationError("invalid_sub_pattern", f"{prob_p}.sub", "Sub-pattern must be a non-empty string up to 200 characters.")
                     if "url" in prob:
                         _validate_link_url(prob["url"], f"{prob_p}.url")
                     _validate_leaf_resources(prob.get("resources", []), f"{prob_p}.resources")
-
-    def _validate_object_fields(value: Any, path: str, allowed: Set[str]):
-        if not isinstance(value, dict):
-            raise ValidationError("invalid_type", path, "Expected an object.")
-        extra = set(value) - allowed
-        if extra:
-            field = sorted(extra)[0]
-            raise ValidationError("unknown_field", f"{path}.{field}", "This field is not part of the v1 contract.")
 
     def _validate_link_url(url: Any, path: str):
         if not isinstance(url, str) or not url or len(url) > 2048:
@@ -424,31 +469,47 @@ def validate_template_document(template_data: Dict[str, Any]) -> Dict[str, Any]:
     elif kind == "workspace-template":
         study_data = content.get("study")
         dsa_data = content.get("dsa")
-        if not study_data and not dsa_data:
+        if "study" not in content and "dsa" not in content:
             raise ValidationError("empty_workspace_template", "template.json.content", "workspace-template must contain study or dsa sections.")
-        if study_data:
+        if "study" in content:
+            _validate_object_fields(study_data, "template.json.content.study", {"sections"})
             _validate_study_sections(study_data.get("sections"), "template.json.content.study.sections")
-        if dsa_data:
+        if "dsa" in content:
+            _validate_object_fields(dsa_data, "template.json.content.dsa", {"sections"})
             _validate_dsa_sections(dsa_data.get("sections"), "template.json.content.dsa.sections")
 
-        # Check plan references if plan is bundled
-        plan = content.get("plan")
-        if plan and isinstance(plan, dict):
-            entries = plan.get("entries", [])
-            for e_idx, entry in enumerate(entries):
-                ep = f"template.json.content.plan.entries[{e_idx}]"
-                tracker = entry.get("tracker")
-                sec_key = entry.get("sectionKey")
-                item_key = entry.get("itemKey")
-                if tracker == "study":
-                    if sec_key not in study_keys or item_key not in study_keys[sec_key]:
-                        raise ValidationError("unresolved_plan_ref", ep, f"Study reference '{sec_key}/{item_key}' does not exist inside workspace bundle.")
-                elif tracker == "dsa":
-                    if sec_key not in dsa_keys or item_key not in dsa_keys[sec_key]:
-                        raise ValidationError("unresolved_plan_ref", ep, f"DSA reference '{sec_key}/{item_key}' does not exist inside workspace bundle.")
-                else:
-                    raise ValidationError("invalid_plan_tracker", f"{ep}.tracker", f"Invalid tracker: {tracker}")
+        if "plan" in content:
+            plan = content["plan"]
+            _validate_object_fields(plan, "template.json.content.plan", {"anchor", "entries"})
+            entries = plan.get("entries")
+            if plan.get("anchor") != "user-selected-start-date" or not isinstance(entries, list) or not 1 <= len(entries) <= 5000:
+                raise ValidationError("invalid_plan", "template.json.content.plan", "Use a relative plan with 1–5000 entries.")
+            seen = set()
+            for index, entry in enumerate(entries):
+                path = f"template.json.content.plan.entries[{index}]"
+                _validate_object_fields(entry, path, {"dayOffset", "tracker", "sectionKey", "itemKey", "sectionName", "itemName", "estimatedMinutes", "note"})
+                offset = entry.get("dayOffset")
+                if type(offset) is not int or not 0 <= offset <= 365:
+                    raise ValidationError("invalid_day_offset", path, "Use an integer day offset from 0 through 365.")
+                tracker, section, item = (entry.get(k) for k in ("tracker", "sectionKey", "itemKey"))
+                if not isinstance(tracker, str) or tracker not in ("study", "dsa"):
+                    raise ValidationError("invalid_plan_tracker", path, "Use study or dsa.")
+                for key in ("sectionKey", "itemKey"):
+                    if not isinstance(entry.get(key), str) or not KEY_REGEX.fullmatch(entry[key]):
+                        raise ValidationError("invalid_plan_reference", path, "Use logical section and item keys.")
+                refs = study_keys if tracker == "study" else dsa_keys
+                if item not in refs.get(section, set()):
+                    raise ValidationError("unresolved_plan_ref", path, "Plan reference is missing from the bundle.")
+                identity = (offset, tracker, section, item)
+                if identity in seen:
+                    raise ValidationError("duplicate_plan_entry", path, "An item can be scheduled once per relative day.")
+                seen.add(identity)
+                _minutes(entry, path)
+                for key in ("sectionName", "itemName", "note"):
+                    if key in entry: _text(entry[key], f"{path}.{key}", 2000 if key == "note" else 160)
 
+    if counts["study"] > 500 or counts["dsa"] > 500 or counts["leaves"] > 5000:
+        raise ValidationError("content_limit_exceeded", "template.json.content", "Use at most 500 groups and 5000 items.")
     # Scan entire template for unsafe fields or progress leaks
     scan_for_security_issues(template_data, "template.json")
     return template_data
